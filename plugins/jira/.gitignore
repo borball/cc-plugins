@@ -1,0 +1,6 @@
+.env
+.env.jira
+.DS_Store
+.current-task.json
+.claude/settings.local.json
+node_modules/

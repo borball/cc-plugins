@@ -1,0 +1,21 @@
+# Credentials
+.env
+.env.slack
+.env.local
+.claude/mcp.json
+.mcp.json
+
+# Caches
+.slack-channel-cache.json
+.slack-user-cache.json
+
+# Exported files
+slack-export-*.md
+
+# OS files
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~

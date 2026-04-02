@@ -1,0 +1,21 @@
+# Credentials
+.env
+.env.redhat
+.env.local
+.claude/mcp.json
+.mcp.json
+
+# Token cache
+.rh-access-token-cache
+
+# Exported cases and attachments
+case-*.md
+case-*-attachments/
+
+# OS files
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~
