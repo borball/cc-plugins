@@ -14,7 +14,6 @@ Based on the first word of the arguments, dispatch as follows:
 - **weekly** → Run `/report:weekly`
 - **monthly** → Run `/report:monthly`
 - **status** → Run `/report:status`
-- **publish** [file] → Run `/report:publish` with the remaining arguments
 - **help** or empty → Show available subcommands listed below
 
 ## Available subcommands
@@ -26,5 +25,4 @@ Based on the first word of the arguments, dispatch as follows:
 /report weekly                             — Generate last 7 days report
 /report monthly                            — Generate last 30 days report
 /report status                             — Show current configuration
-/report publish [file]                     — Publish an HTML report to Confluence
 ```
