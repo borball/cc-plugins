@@ -68,7 +68,6 @@ if [[ -n "$JIRA_JSON" && -f "$JIRA_JSON" ]]; then
     while IFS= read -r row; do
       t=$(echo "$row" | base64 -d)
       key=$(html_escape "$(echo "$t" | jq -r '.key')")
-      type=$(html_escape "$(echo "$t" | jq -r '.type')")
       status=$(echo "$t" | jq -r '.status')
       summary=$(html_escape "$(echo "$t" | jq -r '.summary')")
 
@@ -87,13 +86,13 @@ if [[ -n "$JIRA_JSON" && -f "$JIRA_JSON" ]]; then
         key_cell="<strong>${key}</strong>"
       fi
 
-      jira_rows+="<tr><td>${key_cell}</td><td>${type}</td><td><span class=\"status ${cls}\">${status}</span></td><td>${summary}</td></tr>
+      jira_rows+="<tr><td>${key_cell}</td><td><span class=\"status ${cls}\">${status}</span></td><td>${summary}</td></tr>
 "
     done <<< "$tickets"
 
     jira_html="<h2>Jira</h2>
 <table>
-<tr><th style=\"min-width:160px\">Ticket</th><th>Type</th><th style=\"min-width:110px\">Status</th><th>Summary</th></tr>
+<tr><th style=\"min-width:160px\">Ticket</th><th>Status</th><th>Summary</th></tr>
 ${jira_rows}</table>"
   fi
 fi
@@ -105,28 +104,26 @@ if [[ -f "$GIT_JSON" ]]; then
   # URLs are validated to start with https:// only
   git_rows=$(jq -r '
     group_by(.repo) |
-    sort_by(-length) |
+    [.[] | {data: ., latest: ([.[].date] | max)}] | sort_by(.latest) | reverse | [.[].data] |
     .[] |
     .[0].repo as $repo |
     (.[0].url // "") as $url |
     length as $count |
-    ([.[0:5][].subject | @html] | join("<br>")) as $highlights |
-    (if $count > 5 then $highlights + "<br>… and \($count - 5) more" else $highlights end) as $full |
+    ([.[].subject] | unique) as $unique_subjects |
+    ($unique_subjects | length) as $unique_count |
+    ([$unique_subjects[0:5][] | @html] | join("<br>")) as $highlights |
+    (if $unique_count > 5 then $highlights + "<br>… and \($unique_count - 5) more" else $highlights end) as $full |
     ($repo | @html) as $safe_repo |
     (if ($url | test("^https?://")) then "<a href=\"\($url | @html)\" target=\"_blank\"><strong>\($safe_repo)</strong></a>" else "<strong>\($safe_repo)</strong>" end) as $repo_cell |
-    "<tr><td>\($repo_cell)</td><td>\($count)</td><td>\($full)</td></tr>"
+    "<tr><td>\($repo_cell)</td><td>\($full)</td></tr>"
   ' "$GIT_JSON" 2>/dev/null)
 
-  total=$(jq 'length' "$GIT_JSON" 2>/dev/null || echo 0)
-  repos=$(jq '[.[].repo] | unique | length' "$GIT_JSON" 2>/dev/null || echo 0)
-
-  if [[ "$total" -gt 0 ]]; then
+  if [[ -n "$git_rows" ]]; then
     git_html="<h2>Git Activity</h2>
 <table>
-<tr><th>Repository</th><th>Commits</th><th>Highlights</th></tr>
+<tr><th style=\"min-width:240px\">Repository</th><th>Highlights</th></tr>
 ${git_rows}
-</table>
-<p><strong>Total: ${total} commits across ${repos} repositories</strong></p>"
+</table>"
   fi
 fi
 
