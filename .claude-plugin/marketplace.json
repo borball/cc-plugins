@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "A collection of Claude Code plugins for enterprise tool integrations — Red Hat support cases, Jira task tracking, Slack messaging, and activity reports",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -14,7 +14,7 @@
       "name": "rh-case",
       "source": "./plugins/rh-case",
       "description": "Red Hat support case management — list, show, search, analyze, and comment on cases via the Customer Portal API",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "github.com/borball"
       },
@@ -53,7 +53,7 @@
       "name": "report",
       "source": "./plugins/report",
       "description": "Generate activity reports from git and Jira — daily standups, weekly summaries, custom date ranges",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "github.com/borball"
       },
