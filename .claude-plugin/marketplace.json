@@ -5,8 +5,8 @@
     "email": "borball@gmail.com"
   },
   "metadata": {
-    "description": "A collection of Claude Code plugins for enterprise tool integrations — Red Hat support cases, Jira task tracking, and Slack messaging",
-    "version": "0.1.0",
+    "description": "A collection of Claude Code plugins for enterprise tool integrations — Red Hat support cases, Jira task tracking, Slack messaging, and activity reports",
+    "version": "0.7.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -14,12 +14,12 @@
       "name": "rh-case",
       "source": "./plugins/rh-case",
       "description": "Red Hat support case management — list, show, search, analyze, and comment on cases via the Customer Portal API",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
-        "name": "github.com/openshift-eng"
+        "name": "github.com/borball"
       },
-      "homepage": "https://github.com/borball/cc-redhat-support-case",
-      "repository": "https://github.com/borball/cc-redhat-support-case",
+      "homepage": "https://github.com/borball/cc-plugins/tree/main/plugins/rh-case",
+      "repository": "https://github.com/borball/cc-plugins",
       "keywords": ["redhat", "support", "case", "openshift", "kcs"],
       "category": "support"
     },
@@ -27,27 +27,40 @@
       "name": "jira",
       "source": "./plugins/jira",
       "description": "Jira integration — pick tickets, track time, post work logs, and update status without leaving your terminal",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "github.com/borball"
       },
-      "homepage": "https://github.com/borball/claude-code-jira",
-      "repository": "https://github.com/borball/claude-code-jira",
+      "homepage": "https://github.com/borball/cc-plugins/tree/main/plugins/jira",
+      "repository": "https://github.com/borball/cc-plugins",
       "keywords": ["jira", "tickets", "time-tracking", "worklog"],
       "category": "project-management"
     },
     {
       "name": "slack",
       "source": "./plugins/slack",
-      "description": "Read and search Slack messages — search conversations, read channels, follow threads from your terminal",
+      "description": "Read, search, and send Slack messages — search conversations, read channels, follow threads, send messages from your terminal",
+      "version": "0.4.0",
+      "author": {
+        "name": "github.com/borball"
+      },
+      "homepage": "https://github.com/borball/cc-plugins/tree/main/plugins/slack",
+      "repository": "https://github.com/borball/cc-plugins",
+      "keywords": ["slack", "messaging", "search", "channels"],
+      "category": "communication"
+    },
+    {
+      "name": "report",
+      "source": "./plugins/report",
+      "description": "Generate activity reports from git and Jira — daily standups, weekly summaries, custom date ranges",
       "version": "0.1.0",
       "author": {
         "name": "github.com/borball"
       },
-      "homepage": "https://github.com/borball/claude-code-slack",
-      "repository": "https://github.com/borball/claude-code-slack",
-      "keywords": ["slack", "messaging", "search", "channels"],
-      "category": "communication"
+      "homepage": "https://github.com/borball/cc-plugins/tree/main/plugins/report",
+      "repository": "https://github.com/borball/cc-plugins",
+      "keywords": ["report", "worklog", "git", "jira", "standup"],
+      "category": "productivity"
     }
   ]
 }
