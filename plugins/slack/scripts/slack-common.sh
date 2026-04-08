@@ -5,22 +5,20 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+PLUGIN_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Persistent data directory (survives plugin updates)
-SLACK_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PROJECT_DIR}}"
+SLACK_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PLUGIN_DIR}}"
 
 # ── Config loading ──────────────────────────────────────────────
 load_config() {
   local env_file=""
 
-  # Project-local override first, then plugin data dir, then legacy plugin root
+  # Project-local override first, then plugin data dir
   if [[ -f "$PWD/.env.slack" ]]; then
     env_file="$PWD/.env.slack"
   elif [[ -f "$SLACK_DATA_DIR/.env" ]]; then
     env_file="$SLACK_DATA_DIR/.env"
-  elif [[ -f "$PROJECT_DIR/.env" ]]; then
-    env_file="$PROJECT_DIR/.env"
   fi
 
   if [[ -z "$env_file" ]]; then
@@ -210,10 +208,27 @@ resolve_channel() {
   # Strip leading # if present
   input="${input#\#}"
 
-  # If it looks like a channel ID already (starts with C/G), return it
-  if [[ "$input" =~ ^[CG][A-Z0-9]+$ ]]; then
+  # If it looks like a channel ID already (C=channel, G=group, D=DM), return it
+  if [[ "$input" =~ ^[CGD][A-Z0-9]+$ ]]; then
     echo "$input"
     return 0
+  fi
+
+  # If it looks like a user ID (U...), open a DM conversation
+  if [[ "$input" =~ ^U[A-Z0-9]+$ ]]; then
+    local dm_response
+    dm_response=$(slack_api_form "conversations.open" "users=$input" 2>/dev/null) || {
+      echo "ERROR: Could not open DM with user '$input'." >&2
+      return 1
+    }
+    local dm_channel
+    dm_channel=$(echo "$dm_response" | jq -r '.channel.id // ""')
+    if [[ -n "$dm_channel" && "$dm_channel" != "null" ]]; then
+      echo "$dm_channel"
+      return 0
+    fi
+    echo "ERROR: Could not open DM with user '$input'." >&2
+    return 1
   fi
 
   # Ensure cache exists

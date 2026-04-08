@@ -1,8 +1,15 @@
-# claude-code-slack — Read and search Slack messages from Claude Code
+# slack — Read, search, and send Slack messages from Claude Code
 
-A Claude Code slash command plugin for reading and searching Slack messages directly from your terminal.
+A Claude Code slash command plugin for reading, searching, and sending Slack messages directly from your terminal.
 
 > **Disclaimer:** This is an unofficial community tool. It uses browser session tokens (xoxc/xoxd) to access Slack's API. These tokens provide full user-level access — treat them as secrets. This tool is not endorsed by or affiliated with Slack Technologies.
+
+## IMPORTANT: Running scripts
+
+When running any script from this plugin, always export `CLAUDE_PLUGIN_DATA` so scripts can find credentials:
+```bash
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/<script>.sh [args]
+```
 
 ## Commands
 
@@ -12,6 +19,7 @@ A Claude Code slash command plugin for reading and searching Slack messages dire
 - `/slack search <query>` — Search messages across all channels
 - `/slack read <channel> [--thread THREAD_TS]` — Read channel history or a specific thread
 - `/slack channels [filter]` — List or search cached channels
+- `/slack send <channel> <message> [--thread TS]` — Send a message to a channel or thread
 
 ## Architecture
 
@@ -22,6 +30,7 @@ A Claude Code slash command plugin for reading and searching Slack messages dire
   - `slack-search.sh` — Search messages across workspace
   - `slack-read.sh` — Read channel history or thread replies
   - `slack-channels.sh` — List and lookup channels
+  - `slack-send.sh` — Send a message to a channel or thread
 
 ## API Used
 
@@ -31,6 +40,7 @@ A Claude Code slash command plugin for reading and searching Slack messages dire
   - `conversations.history` — Channel message history
   - `conversations.replies` — Thread replies
   - `conversations.list` — List channels (for name→ID lookup, may be restricted on enterprise)
+  - `chat.postMessage` — Send a message to a channel or thread
 
 ## Setup
 
@@ -46,3 +56,5 @@ A Claude Code slash command plugin for reading and searching Slack messages dire
 - Auth uses xoxc token as Bearer + xoxd as cookie `d=` value
 - Never log or echo tokens in output
 - Both channel names and channel IDs are accepted in `/slack read`
+- User IDs (U...) are accepted in `/slack send` — they are resolved to DM channels automatically
+- When sending messages, ALWAYS resolve user IDs to display names before showing confirmation. Use `slack-resolve-user.sh <user_id>` to get the display name. Never show raw user IDs (U0123...) to the user in confirmations.

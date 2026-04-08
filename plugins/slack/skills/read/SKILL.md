@@ -11,13 +11,13 @@ The first argument should be a channel name (with or without #). Additional flag
 
 Run:
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/slack-read.sh CHANNEL [--thread THREAD_TS] [--limit N] [--since DAYS]
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/slack-read.sh CHANNEL [--thread THREAD_TS] [--limit N] [--since DAYS]
 ```
 
 **Interpreting user intent:**
-- "read team-backend" → `${CLAUDE_PLUGIN_ROOT}/scripts/slack-read.sh team-backend`
-- "read #incidents last 3 days" → `${CLAUDE_PLUGIN_ROOT}/scripts/slack-read.sh incidents --since 3`
-- "read thread 1234567890.123456 in team-backend" → `${CLAUDE_PLUGIN_ROOT}/scripts/slack-read.sh team-backend --thread 1234567890.123456`
+- "read team-backend" → `CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/slack-read.sh team-backend`
+- "read #incidents last 3 days" → `CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/slack-read.sh incidents --since 3`
+- "read thread 1234567890.123456 in team-backend" → `CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/slack-read.sh team-backend --thread 1234567890.123456`
 
 **Channel resolution:** Both channel names and channel IDs work. On enterprise workspaces, channel name lookup may fail — if so, use the channel ID directly (e.g., `C0123ABCDEF`). Channel IDs are shown in search results and Slack URLs.
 

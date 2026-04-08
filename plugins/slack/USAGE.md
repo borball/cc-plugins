@@ -58,6 +58,22 @@ When you see an interesting message with replies, read the full thread:
 
 Thread timestamps (`ts`) are shown in search results and channel history. Claude will often suggest reading a thread when it spots one with replies.
 
+### Send a message
+
+```
+> /slack send #team-backend "Deploy is complete, all tests passing"
+> /slack send team-backend "Looks good to me" --thread 1234567890.123456
+```
+
+Or conversationally:
+
+```
+> send a message to #team-backend saying the deploy is done
+> reply to that thread saying I'll look into it
+```
+
+**Note:** Claude will always show you the message preview and ask for confirmation before sending.
+
 ### List channels
 
 ```

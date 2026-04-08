@@ -1,6 +1,6 @@
-# claude-code-slack
+# slack
 
-[Claude Code](https://claude.ai/code) slash commands for reading and searching Slack messages — search conversations, read channels, follow threads, all without leaving your terminal.
+[Claude Code](https://claude.ai/code) slash commands for reading, searching, and sending Slack messages — search conversations, read channels, follow threads, send messages, all without leaving your terminal.
 
 > **Disclaimer:** This is an unofficial community tool. It uses browser session tokens (xoxc/xoxd) to access Slack's Web API with your user-level permissions. These tokens provide full account access — treat them as secrets. This tool is **not** endorsed by or affiliated with Slack Technologies. Use at your own risk.
 
@@ -13,6 +13,7 @@
 | `/slack search <query>` | Search messages across all channels |
 | `/slack read <channel> [--thread TS]` | Read channel history or a specific thread |
 | `/slack channels [filter]` | List or search channels |
+| `/slack send <channel> <message> [--thread TS]` | Send a message to a channel or thread |
 
 ## Prerequisites
 
@@ -77,6 +78,8 @@ See **[USAGE.md](USAGE.md)** for a full guide with examples — searching conver
 /slack read team-backend --thread 1234567890.123456
 /slack read C0123ABCDEF --limit 10
 /slack channels platform
+/slack send #team-backend "Deploy is complete"
+/slack send team-backend "Looks good" --thread 1234567890.123456
 ```
 
 ## Enterprise Slack Workspaces
@@ -101,8 +104,8 @@ When tokens expire, commands will show a clear error message. Run `/slack init` 
 
 This tool is designed to complement other Claude Code plugins:
 
-- **[claude-code-jira](https://github.com/borball/claude-code-jira)** — Jira task tracking (pick tickets, track time, post work logs)
-- **[cc-redhat-support-case](https://github.com/borball/cc-redhat-support-case)** — Red Hat support case management
+- **[jira](../jira/)** — Jira task tracking (pick tickets, track time, post work logs)
+- **[rh-case](../rh-case/)** — Red Hat support case management
 
 When all three are installed, Claude can cross-reference data across systems — find Slack discussions about a Jira ticket, look up support cases mentioned in a channel thread, or search for context across all three tools at once.
 
@@ -117,21 +120,23 @@ When all three are installed, Claude can cross-reference data across systems —
 
 ```
 slack/
+├── .claude-plugin/
+│   └── plugin.json            # Plugin manifest
 ├── skills/                    # Skill definitions
 │   ├── slack/SKILL.md         # Main /slack router
-│   ├── slack-init/SKILL.md    # /slack init
-│   ├── slack-status/SKILL.md  # /slack status
-│   ├── slack-search/SKILL.md  # /slack search
-│   └── slack-read/SKILL.md    # /slack read
+│   ├── init/SKILL.md          # /slack:init
+│   ├── status/SKILL.md        # /slack:status
+│   ├── search/SKILL.md        # /slack:search
+│   ├── read/SKILL.md          # /slack:read
+│   └── send/SKILL.md          # /slack:send
 ├── scripts/
 │   ├── slack-common.sh        # Shared auth, API helpers, channel/user caching
 │   ├── slack-auth-status.sh   # Verify authentication
 │   ├── slack-search.sh        # Search messages across workspace
 │   ├── slack-read.sh          # Read channel history or thread replies
-│   └── slack-channels.sh     # List and lookup channels
-├── CLAUDE.md                  # Project instructions for Claude
-├── .env.example               # Credentials template
-└── .gitignore
+│   ├── slack-channels.sh     # List and lookup channels
+│   └── slack-send.sh          # Send messages to channels/threads
+└── CLAUDE.md                  # Project instructions for Claude
 ```
 
 ## License

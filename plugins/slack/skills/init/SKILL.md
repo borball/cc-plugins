@@ -43,7 +43,7 @@ SLACK_WORKSPACE=<workspace name if known>
 
 After writing the file, verify the setup by running:
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/slack-auth-status.sh
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/slack-auth-status.sh
 ```
 
 If authentication succeeds, confirm setup is complete and suggest running `/slack channels` to build the channel cache.
