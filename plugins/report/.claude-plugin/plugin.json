@@ -1,6 +1,6 @@
 {
   "name": "report",
-  "description": "Generate activity reports from git and Jira",
+  "description": "Generate activity reports from git and Jira — daily standups, weekly summaries, custom date ranges",
   "author": {
     "name": "github.com/borball"
   }

@@ -128,7 +128,8 @@ slack/
 │   ├── status/SKILL.md        # /slack:status
 │   ├── search/SKILL.md        # /slack:search
 │   ├── read/SKILL.md          # /slack:read
-│   └── send/SKILL.md          # /slack:send
+│   ├── send/SKILL.md          # /slack:send
+│   └── channels/SKILL.md      # /slack:channels
 ├── scripts/
 │   ├── slack-common.sh        # Shared auth, API helpers, channel/user caching
 │   ├── slack-auth-status.sh   # Verify authentication

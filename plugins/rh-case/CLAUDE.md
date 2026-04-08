@@ -24,8 +24,7 @@ CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/<script
 
 ## Architecture
 
-- **Commands** (`commands/`) — User-invoked plugin commands
-- **Skills** (`skills/`) — AI-invoked analysis skill
+- **Skills** (`skills/`) — Skill definitions (SKILL.md per skill)
 - **Scripts** (`scripts/`) — Shell scripts that call Red Hat APIs via `curl` + `jq`
 - **Credentials** — Stored at `${CLAUDE_PLUGIN_DATA}/.env`
 - **Token cache** — `$TMPDIR/.rh-access-token-cache` (15-min TTL, auto-refresh)

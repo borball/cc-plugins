@@ -1,6 +1,6 @@
 {
   "name": "slack",
-  "description": "Read and search Slack messages — search conversations, read channels, follow threads from your terminal",
+  "description": "Read, search, and send Slack messages — search conversations, read channels, follow threads, send messages from your terminal",
   "author": {
     "name": "github.com/borball"
   }

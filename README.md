@@ -166,7 +166,6 @@ cc-plugins/
 │   ├── rh-case/                  # Red Hat support case plugin
 │   │   ├── .claude-plugin/
 │   │   │   └── plugin.json
-│   │   ├── commands/
 │   │   ├── skills/
 │   │   └── scripts/
 │   ├── jira/                     # Jira integration plugin

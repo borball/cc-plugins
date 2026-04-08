@@ -52,18 +52,15 @@ Credentials are stored in `${CLAUDE_PLUGIN_DATA}/.env` (persistent directory tha
 rh-case/
 ├── .claude-plugin/
 │   └── plugin.json           # Plugin manifest
-├── commands/                  # User-invoked commands
-│   ├── init.md
-│   ├── list.md
-│   ├── show.md
-│   ├── search.md
-│   ├── analyze.md
-│   ├── comment.md
-│   ├── export.md
-│   └── status.md
-├── skills/                    # AI-invoked skills
-│   └── analyze/
-│       └── SKILL.md
+├── skills/                    # Skill definitions
+│   ├── init/SKILL.md
+│   ├── list/SKILL.md
+│   ├── show/SKILL.md
+│   ├── search/SKILL.md
+│   ├── analyze/SKILL.md
+│   ├── comment/SKILL.md
+│   ├── export/SKILL.md
+│   └── status/SKILL.md
 └── scripts/                   # Shell scripts for API calls
     ├── rh-case-common.sh
     ├── rh-case-auth-status.sh
