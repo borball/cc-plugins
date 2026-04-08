@@ -1,0 +1,7 @@
+{
+  "name": "report",
+  "description": "Generate activity reports from git and Jira",
+  "author": {
+    "name": "github.com/borball"
+  }
+}
