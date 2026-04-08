@@ -4,13 +4,13 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Persistent data directory (survives plugin updates)
-JIRA_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PROJECT_ROOT}}"
+JIRA_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PLUGIN_DIR}}"
 
-# Load .env: local project override > plugin data dir > legacy plugin root
-# Priority: ./.env.jira > JIRA_DATA_DIR/.env > PROJECT_ROOT/.env
+# Load .env: local project override > plugin data dir
+# Priority: ./.env.jira > JIRA_DATA_DIR/.env
 if [[ -f "./.env.jira" ]]; then
   set -a
   source "./.env.jira"
@@ -18,10 +18,6 @@ if [[ -f "./.env.jira" ]]; then
 elif [[ -f "$JIRA_DATA_DIR/.env" ]]; then
   set -a
   source "$JIRA_DATA_DIR/.env"
-  set +a
-elif [[ -f "$PROJECT_ROOT/.env" ]]; then
-  set -a
-  source "$PROJECT_ROOT/.env"
   set +a
 fi
 

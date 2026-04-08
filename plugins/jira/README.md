@@ -1,4 +1,4 @@
-# claude-code-jira
+# jira
 
 Claude Code slash commands for Jira integration — pick tickets, track time, post work logs, and update status without leaving your terminal.
 
@@ -91,7 +91,7 @@ Posts the work log, then asks if you want to transition the ticket to Done.
 
 Run `/jira init` in a Claude Code session. Claude will ask for:
 
-1. **Jira Base URL** — `https://yourcompany.atlassian.net`
+1. **Jira Base URL** — `https://redhat.atlassian.net` (default)
 2. **Email** — your Jira account email
 3. **API Token** — from [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
 4. **Project Key** — e.g., `PROJ`, `ENG`
@@ -104,27 +104,28 @@ Credentials are stored in `${CLAUDE_PLUGIN_DATA}/.env` — a persistent director
 
 ```
 jira/
+├── .claude-plugin/
+│   └── plugin.json            # Plugin manifest
 ├── skills/                    # Skill definitions
 │   ├── jira/SKILL.md          # Main /jira router
-│   ├── jira-init/SKILL.md     # /jira init
-│   ├── jira-start/SKILL.md    # /jira start
-│   ├── jira-status/SKILL.md   # /jira status
-│   ├── jira-log/SKILL.md      # /jira log
-│   └── jira-done/SKILL.md     # /jira done
+│   ├── init/SKILL.md          # /jira:init
+│   ├── start/SKILL.md         # /jira:start
+│   ├── status/SKILL.md        # /jira:status
+│   ├── log/SKILL.md           # /jira:log
+│   └── done/SKILL.md          # /jira:done
 ├── scripts/
 │   ├── jira-common.sh         # Shared auth & API helpers
-│   ├── jira-create.sh         # Create new tickets
+│   ├── jira-init.sh           # Interactive credential setup
 │   ├── jira-pick.sh           # Interactive ticket picker
+│   ├── jira-create.sh         # Create new tickets
 │   ├── jira-transition.sh     # Transition ticket status
 │   ├── jira-log.sh            # Post work logs & comments
 │   ├── jira-status.sh         # Show current task
-│   ├── jira-init.sh           # Interactive credential setup
 │   ├── generate-worklog.sh    # Gather git context for summaries
 │   └── build-adf.py           # Markdown to Jira ADF converter
 ├── hooks/                     # Optional session hooks
 ├── templates/                 # Work log templates
 ├── CLAUDE.md                  # Project instructions for Claude
-├── .env.example               # Credentials template
 └── LICENSE
 ```
 

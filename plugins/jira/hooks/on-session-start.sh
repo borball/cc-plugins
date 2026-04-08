@@ -4,8 +4,8 @@
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-JIRA_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PROJECT_ROOT}}"
+PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
+JIRA_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PLUGIN_DIR}}"
 CURRENT_TASK_FILE="$JIRA_DATA_DIR/.current-task.json"
 
 if [[ -f "$CURRENT_TASK_FILE" ]]; then
@@ -13,7 +13,7 @@ if [[ -f "$CURRENT_TASK_FILE" ]]; then
   SUMMARY=$(python3 -c "import json; d=json.load(open('$CURRENT_TASK_FILE')); print(d['summary'])")
   STATUS=$(python3 -c "import json; d=json.load(open('$CURRENT_TASK_FILE')); print(d['status'])")
   echo "Active task: [$KEY] $SUMMARY (Status: $STATUS)"
-  echo "Use ./scripts/jira-status.sh for details, or pick a new task with ./scripts/jira-pick.sh"
+  echo "Use /jira status for details, or pick a new task with /jira start"
 else
-  echo "No active Jira task. Run ./scripts/jira-pick.sh to select one."
+  echo "No active Jira task. Run /jira start to select one."
 fi

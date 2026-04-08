@@ -8,11 +8,11 @@ Jira task management command. Parse the subcommand and arguments from: $ARGUMENT
 
 Based on the first word of the arguments, dispatch as follows:
 
-- **init** → Run `/jira-init`
-- **start** [TICKET-KEY] → Run `/jira-start` with the remaining arguments
-- **status** → Run `/jira-status`
-- **log** [message] → Run `/jira-log` with the remaining arguments
-- **done** [message] → Run `/jira-done` with the remaining arguments
+- **init** → Run `/jira:init`
+- **start** [TICKET-KEY] → Run `/jira:start` with the remaining arguments
+- **status** → Run `/jira:status`
+- **log** [message] → Run `/jira:log` with the remaining arguments
+- **done** [message] → Run `/jira:done` with the remaining arguments
 - **help** or empty → Show available subcommands listed below
 
 ## Available subcommands

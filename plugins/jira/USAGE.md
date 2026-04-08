@@ -1,6 +1,6 @@
 # Usage Guide: AI-Native Task Tracking with Claude Code
 
-This guide shows how claude-code-jira works in practice — real conversational workflows where Claude handles your Jira tickets while you focus on code.
+This guide shows how the jira plugin works in practice — real conversational workflows where Claude handles your Jira tickets while you focus on code.
 
 ## Setup (one time)
 

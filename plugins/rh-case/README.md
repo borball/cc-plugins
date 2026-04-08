@@ -105,14 +105,10 @@ See **[USAGE.md](USAGE.md)** for a full guide with examples of AI-native workflo
 - Access tokens are cached in `$TMPDIR/.rh-access-token-cache` (15-min TTL, auto-refresh)
 - Credentials stored in `${CLAUDE_PLUGIN_DATA}/.env` — persistent directory that survives plugin updates
 
-## Migration
+## Related Plugins
 
-If you previously stored credentials at `~/.config/claude-code/rh-case.env` or `~/.local/share/cc-redhat-support-case/.env`, they will still be found (legacy fallback). Run `/rh-case:init` to migrate to the new `${CLAUDE_PLUGIN_DATA}` location.
-
-## Related Projects
-
-- **[claude-code-jira](https://github.com/borball/claude-code-jira)** — Claude Code plugin for Jira task management
-- **[claude-code-slack](https://github.com/borball/claude-code-slack)** — Claude Code plugin for Slack workspace management
+- **[jira](../jira/)** — Claude Code plugin for Jira task management
+- **[slack](../slack/)** — Claude Code plugin for Slack messaging
 
 ## Acknowledgments
 

@@ -58,7 +58,7 @@ Summarize key findings from the attachments before proceeding.
 
 Run the show script to get case metadata, description, and full comment history:
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/rh-case-show.sh CASE_NUMBER --comments --attachments
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/rh-case-show.sh CASE_NUMBER --comments --attachments
 ```
 
 ### Step 4: Generate analysis summary
@@ -75,7 +75,7 @@ Combine all available data to produce:
 
 Extract 2-3 key technical terms from the case and search KCS:
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/rh-case-search.sh --type kcs "<extracted keywords>"
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/rh-case-search.sh --type kcs "<extracted keywords>"
 ```
 
 Try multiple keyword combinations if the first search yields poor results.
@@ -84,7 +84,7 @@ Try multiple keyword combinations if the first search yields poor results.
 
 Use the same keywords to find related support cases:
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/rh-case-search.sh --type cases "<extracted keywords>"
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/rh-case-search.sh --type cases "<extracted keywords>"
 ```
 
 ### Step 7: Search Jira for related bugs

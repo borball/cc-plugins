@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Persistent data directory (survives plugin updates)
-RH_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${HOME}/.local/share/cc-redhat-support-case}"
+RH_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PLUGIN_DIR}}"
 
 # ── Config loading ──────────────────────────────────────────────
 load_config() {
@@ -22,16 +22,11 @@ load_config() {
 
   # Search order:
   # 1. Project-local .env.redhat (user override per-project)
-  # 2. Plugin data directory (recommended)
-  # 3. Legacy locations (migration support)
+  # 2. Plugin data directory
   if [[ -f "$PWD/.env.redhat" ]]; then
     env_file="$PWD/.env.redhat"
   elif [[ -f "${RH_DATA_DIR}/.env" ]]; then
     env_file="${RH_DATA_DIR}/.env"
-  elif [[ -f "${HOME}/.config/claude-code/rh-case.env" ]]; then
-    env_file="${HOME}/.config/claude-code/rh-case.env"
-  elif [[ -f "${HOME}/.local/share/cc-redhat-support-case/.env" ]]; then
-    env_file="${HOME}/.local/share/cc-redhat-support-case/.env"
   fi
 
   if [[ -z "$env_file" ]]; then

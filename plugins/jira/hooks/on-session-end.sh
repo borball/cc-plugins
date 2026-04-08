@@ -4,8 +4,8 @@
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-JIRA_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PROJECT_ROOT}}"
+PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
+JIRA_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PLUGIN_DIR}}"
 CURRENT_TASK_FILE="$JIRA_DATA_DIR/.current-task.json"
 
 if [[ -f "$CURRENT_TASK_FILE" ]]; then
@@ -31,6 +31,6 @@ else:
   echo "Time elapsed: $ELAPSED"
   echo ""
   echo "Don't forget to log your work:"
-  echo "  ./scripts/jira-log.sh --message \"your summary here\""
-  echo "  ./scripts/jira-transition.sh \"\" done   # if task is complete"
+  echo "  /jira log your summary here"
+  echo "  /jira done   # if task is complete"
 fi

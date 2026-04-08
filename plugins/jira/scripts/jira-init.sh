@@ -4,10 +4,10 @@
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Persistent data directory (survives plugin updates)
-JIRA_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PROJECT_ROOT}}"
+JIRA_DATA_DIR="${CLAUDE_PLUGIN_DATA:-${PLUGIN_DIR}}"
 mkdir -p "$JIRA_DATA_DIR"
 ENV_FILE="$JIRA_DATA_DIR/.env"
 
@@ -29,7 +29,8 @@ echo "Create an API token at:"
 echo "  https://id.atlassian.com/manage-profile/security/api-tokens"
 echo ""
 
-read -rp "Jira URL (e.g. https://mycompany.atlassian.net): " JIRA_URL
+read -rp "Jira URL [https://redhat.atlassian.net]: " JIRA_URL
+JIRA_URL="${JIRA_URL:-https://redhat.atlassian.net}"
 read -rp "Jira Username (email): " JIRA_USERNAME
 read -rp "Jira API Token: " JIRA_API_TOKEN
 read -rp "Jira Project Key (e.g. PROJ, ENG): " JIRA_PROJECT_KEY
@@ -43,7 +44,7 @@ JIRA_JQL_FILTER="assignee = currentUser() AND status != Done ORDER BY updated DE
 EOF
 
 echo ""
-echo "Config saved to .env"
+echo "Config saved to $ENV_FILE"
 echo ""
 echo "Testing connection..."
 echo ""

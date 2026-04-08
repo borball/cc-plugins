@@ -1,12 +1,12 @@
 # Red Hat Support Case Manager
 
-Claude Code standalone plugin for Red Hat support case management.
+Claude Code plugin for Red Hat support case management.
 
-## Installation
+## IMPORTANT: Running scripts
 
-Load as standalone plugin:
+When running any script from this plugin, always export `CLAUDE_PLUGIN_DATA` so scripts can find credentials:
 ```bash
-claude --plugin-dir ./cc-redhat-support-case
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/<script>.sh [args]
 ```
 
 ## Commands

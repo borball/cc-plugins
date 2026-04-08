@@ -46,13 +46,23 @@ if [[ -n "$THREAD_TS" ]]; then
   echo "## Thread in #${CHANNEL#\#}"
   echo ""
 
-  echo "$RESPONSE" | jq -r --arg cache "$USER_CACHE_FILE" '
+  # Collect unique user IDs and resolve names
+  user_ids=$(echo "$RESPONSE" | jq -r '.messages[].user // empty' | sort -u)
+  declare -A USER_NAMES
+  for uid in $user_ids; do
+    USER_NAMES["$uid"]=$(resolve_user "$uid")
+  done
+
+  while IFS= read -r line; do
+    # Replace user IDs with display names
+    for uid in "${!USER_NAMES[@]}"; do
+      line="${line//$uid/${USER_NAMES[$uid]}}"
+    done
+    echo "$line"
+  done < <(echo "$RESPONSE" | jq -r '
     .messages[] |
     "**" + (.user // "unknown") + "** — " + (.ts | split(".")[0] | tonumber | strftime("%Y-%m-%d %H:%M")) +
-    "\n" + (.text // "(empty)") + "\n"'
-
-  # Resolve user IDs to names in output
-  # (handled by Claude interpreting the output)
+    "\n" + (.text // "(empty)") + "\n"')
 
 else
   # ── Read channel history ─────────────────────────────────────
@@ -79,8 +89,20 @@ else
     exit 0
   fi
 
+  # Collect unique user IDs and resolve names
+  user_ids=$(echo "$RESPONSE" | jq -r '.messages[].user // empty' | sort -u)
+  declare -A USER_NAMES
+  for uid in $user_ids; do
+    USER_NAMES["$uid"]=$(resolve_user "$uid")
+  done
+
   # Display messages (newest last for natural reading)
-  echo "$RESPONSE" | jq -r '
+  while IFS= read -r line; do
+    for uid in "${!USER_NAMES[@]}"; do
+      line="${line//$uid/${USER_NAMES[$uid]}}"
+    done
+    echo "$line"
+  done < <(echo "$RESPONSE" | jq -r '
     .messages | reverse | .[] |
     "---",
     "**" + (.user // "bot") + "** — " + (.ts | split(".")[0] | tonumber | strftime("%Y-%m-%d %H:%M")) +
@@ -88,5 +110,5 @@ else
     "",
     (.text // "(empty)"),
     (if .thread_ts and .thread_ts == .ts and .reply_count then "\n_Thread ts: " + .thread_ts + "_" else "" end),
-    ""'
+    ""')
 fi

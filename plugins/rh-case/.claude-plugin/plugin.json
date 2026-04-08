@@ -1,8 +1,7 @@
 {
   "name": "rh-case",
   "description": "Red Hat support case management — list, show, search, analyze, and comment on cases via the Customer Portal API",
-  "version": "0.1.0",
   "author": {
-    "name": "github.com/openshift-eng"
+    "name": "github.com/borball"
   }
 }

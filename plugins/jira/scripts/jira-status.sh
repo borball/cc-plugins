@@ -36,7 +36,7 @@ else:
 if [[ -f "./.env.jira" ]]; then
   CONFIG_SOURCE="./.env.jira (project)"
 else
-  CONFIG_SOURCE="$PROJECT_ROOT/.env (global)"
+  CONFIG_SOURCE="$JIRA_DATA_DIR/.env (global)"
 fi
 
 echo "Current Task"
