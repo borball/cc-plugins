@@ -11,7 +11,9 @@ Generate an activity report. Arguments: $ARGUMENTS
 Parse from arguments:
 - A number of days (default 7): e.g. `14` means last 14 days
 - `--since YYYY-MM-DD` and/or `--until YYYY-MM-DD` for custom range
-- `--format md|html` — output format (default: md)
+- `--format md|html|all` — output format (default: all)
+- `--min-commits N` — hide repos with fewer than N commits (default: 3)
+- `--highlights N` — number of top items to highlight (default: 3)
 
 If no dates given, default to last 7 days.
 
@@ -38,9 +40,24 @@ JQL: `assignee = currentUser() AND updated >= "YYYY-MM-DD" AND updated <= "YYYY-
 
 If the jira plugin is not installed or not configured, skip this step.
 
-### Step 4: Format the report
+### Step 4: Format the markdown report
 
-Generate a concise markdown report:
+Apply these formatting rules:
+
+#### Jira table
+- **No Type column** — omit issuetype, keep only: Ticket, Status, Summary
+- **Jira links** — ticket IDs link to `$JIRA_URL/browse/TICKET-KEY`
+- **Status icons** — use emoji instead of text: ✅ for Done/Closed/Resolved, 🔄 for In Progress, 📋 for New/To Do
+- **Deduplicate** — if multiple tickets share the same summary, keep only the first one
+
+#### Git table
+- **Minimum commits filter** — hide repos with fewer than `--min-commits` (default 3) commits
+- **Sort by commit count** descending
+- Group commits by repo with count and key highlights (top 3 commit subjects)
+
+#### Summary
+- Write a brief 2-3 sentence human-readable summary capturing overall themes
+- Include total commit count, repo count, and ticket count
 
 ```markdown
 # Activity Report: {since} — {until}
@@ -51,9 +68,10 @@ Brief 2-3 sentence overview of what was accomplished.
 
 ## Jira
 
-| Ticket | Type | Status | Summary |
-|--------|------|--------|---------|
-| KEY-123 | Task | Done   | Summary |
+| Ticket | Status | Summary |
+|--------|--------|---------|
+| [KEY-123](https://jira.example.com/browse/KEY-123) | ✅ | Summary |
+| [KEY-456](https://jira.example.com/browse/KEY-456) | 🔄 | Summary |
 
 ## Git Activity
 
@@ -64,19 +82,16 @@ Brief 2-3 sentence overview of what was accomplished.
 
 Guidelines:
 - Keep it concise — summary, not changelog
-- Group commits by repo with count and key highlights
 - Omit sections with no data entirely
-- Write a human-readable summary that captures overall themes
 - Save the report as `report-{since}-to-{until}.md` in the current directory
 
-### Step 5: Generate HTML (if requested)
+### Step 5: Generate HTML
 
-If the user requests HTML format (`--format html`):
+Always generate HTML alongside markdown (unless `--format md` was specified).
 
-1. Save the git JSON to a temp file and optionally the Jira JSON
-2. Run the HTML generator:
+Save the git JSON to a temp file and optionally the Jira JSON, then run:
 ```bash
-CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/report-html.sh <output.html> "<since display>" "<until display>" <git.json> [jira.json] [jira_url] [author] [role]
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/report-html.sh <output.html> "<since>" "<until>" <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights]
 ```
 
-Parameters: jira_url is auto-detected from jira plugin config, author from git config. The HTML report uses a built-in styled template with tables and status badges.
+Parameters: jira_url is auto-detected from jira plugin config, author from git config. The HTML report uses a compact styled template with colored status badges and highlighted top items.

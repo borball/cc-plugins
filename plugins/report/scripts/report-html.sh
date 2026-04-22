@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-# report-html.sh — Generate a styled HTML report from git and Jira JSON data
-# Usage: report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [role]
+# report-html.sh — Generate a compact styled HTML report from git and Jira JSON data
+# Usage: report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights]
 
 set -euo pipefail
 
-OUTPUT="${1:?Usage: report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [role]}"
+OUTPUT="${1:?Usage: report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights]}"
 SINCE="${2:?}"
 UNTIL="${3:?}"
 GIT_JSON="${4:?}"
 JIRA_JSON="${5:-}"
 JIRA_URL="${6:-}"
 AUTHOR="${7:-}"
-ROLE="${8:-}"
+MIN_COMMITS="${8:-3}"
+HIGHLIGHTS="${9:-3}"
 
 # ── HTML escaping ─────────────────────────────────────────────────
 html_escape() {
@@ -34,140 +35,141 @@ if [[ -z "$JIRA_URL" && -n "$JIRA_JSON" ]]; then
 fi
 JIRA_URL="${JIRA_URL%/}"
 
-# Validate JIRA_URL is https
 if [[ -n "$JIRA_URL" && ! "$JIRA_URL" =~ ^https?:// ]]; then
   JIRA_URL=""
 fi
 
-# Auto-detect author from git config if not provided
 if [[ -z "$AUTHOR" ]]; then
   AUTHOR=$(git config --global user.name 2>/dev/null || echo "")
 fi
 
-# Build author subtitle (escaped)
-author_html=""
-if [[ -n "$AUTHOR" && -n "$ROLE" ]]; then
-  author_html="<p class=\"author\">$(html_escape "$AUTHOR") — $(html_escape "$ROLE")</p>"
-elif [[ -n "$AUTHOR" ]]; then
-  author_html="<p class=\"author\">$(html_escape "$AUTHOR")</p>"
-fi
-
 # ── Build Jira table rows ────────────────────────────────────────
 jira_html=""
+ticket_count=0
 if [[ -n "$JIRA_JSON" && -f "$JIRA_JSON" ]]; then
-  tickets=$(jq -r '
-    if .issues then
-      [.issues[] | {key: .key, summary: .fields.summary, status: .fields.status.name, type: .fields.issuetype.name}]
-    elif .tickets then .tickets
+  # Deduplicate by summary, map status to badge class
+  jira_rows_json=$(jq -r '
+    (if .issues then
+      [.issues[] | {key: .key, summary: .fields.summary, status_key: .fields.status.statusCategory.key, status_name: .fields.status.name}]
     elif type == "array" then .
-    else [] end | .[] |
-    @base64' "$JIRA_JSON" 2>/dev/null)
+    else [] end) |
+    # Deduplicate by summary
+    reduce .[] as $t ([]; if [.[] | select(.summary == $t.summary)] | length == 0 then . + [$t] else . end)
+  ' "$JIRA_JSON" 2>/dev/null)
 
-  if [[ -n "$tickets" ]]; then
+  ticket_count=$(echo "$jira_rows_json" | jq 'length')
+
+  if [[ "$ticket_count" -gt 0 ]]; then
     jira_rows=""
+    idx=0
     while IFS= read -r row; do
-      t=$(echo "$row" | base64 -d)
-      key=$(html_escape "$(echo "$t" | jq -r '.key')")
-      status=$(echo "$t" | jq -r '.status')
-      summary=$(html_escape "$(echo "$t" | jq -r '.summary')")
+      key=$(echo "$row" | jq -r '.key')
+      summary=$(html_escape "$(echo "$row" | jq -r '.summary')")
+      status_key=$(echo "$row" | jq -r '.status_key')
 
-      # Status badge class
-      case "${status,,}" in
-        closed|done|resolved) cls="status-closed" ;;
-        *progress*)           cls="status-progress" ;;
-        *)                    cls="status-new" ;;
+      case "$status_key" in
+        done)          badge_cls="done"; badge_txt="Done" ;;
+        indeterminate) badge_cls="wip";  badge_txt="WIP" ;;
+        *)             badge_cls="new";  badge_txt="New" ;;
       esac
-      status=$(html_escape "$status")
 
-      # Ticket link
-      if [[ -n "$JIRA_URL" ]]; then
-        key_cell="<a href=\"${JIRA_URL}/browse/${key}\" target=\"_blank\"><strong>${key}</strong></a>"
-      else
-        key_cell="<strong>${key}</strong>"
+      hl=""
+      if [[ $idx -lt $HIGHLIGHTS ]]; then
+        hl=' class="hl"'
       fi
 
-      jira_rows+="<tr><td>${key_cell}</td><td><span class=\"status ${cls}\">${status}</span></td><td>${summary}</td></tr>
-"
-    done <<< "$tickets"
+      if [[ -n "$JIRA_URL" ]]; then
+        key_cell="<a href=\"${JIRA_URL}/browse/${key}\">${key}</a>"
+      else
+        key_cell="${key}"
+      fi
 
-    jira_html="<h2>Jira</h2>
+      jira_rows+="<tr${hl}><td>${key_cell}</td><td class=\"s\"><span class=\"badge ${badge_cls}\">${badge_txt}</span></td><td>${summary}</td></tr>
+"
+      idx=$((idx + 1))
+    done < <(echo "$jira_rows_json" | jq -c '.[]')
+
+    jira_html="
+<h2>Jira</h2>
 <table>
-<tr><th style=\"min-width:160px\">Ticket</th><th>Status</th><th>Summary</th></tr>
+<tr><th>Ticket</th><th class=\"s\"></th><th>Summary</th></tr>
 ${jira_rows}</table>"
   fi
 fi
 
 # ── Build Git table rows ─────────────────────────────────────────
 git_html=""
+total_commits=0
+repo_count=0
 if [[ -f "$GIT_JSON" ]]; then
-  # Use @html in jq to escape commit subjects, repo names stay safe via @html too
-  # URLs are validated to start with https:// only
-  git_rows=$(jq -r '
+  # Group by repo, filter by min commits, sort by count desc
+  git_repos_json=$(jq --argjson min "$MIN_COMMITS" '
     group_by(.repo) |
-    [.[] | {data: ., latest: ([.[].date] | max)}] | sort_by(.latest) | reverse | [.[].data] |
-    .[] |
-    .[0].repo as $repo |
-    (.[0].url // "") as $url |
-    length as $count |
-    ([.[].subject] | unique) as $unique_subjects |
-    ($unique_subjects | length) as $unique_count |
-    ([$unique_subjects[0:5][] | @html] | join("<br>")) as $highlights |
-    (if $unique_count > 5 then $highlights + "<br>… and \($unique_count - 5) more" else $highlights end) as $full |
-    ($repo | @html) as $safe_repo |
-    (if ($url | test("^https?://")) then "<a href=\"\($url | @html)\" target=\"_blank\"><strong>\($safe_repo)</strong></a>" else "<strong>\($safe_repo)</strong>" end) as $repo_cell |
-    "<tr><td>\($repo_cell)</td><td>\($full)</td></tr>"
+    [.[] | {
+      repo: .[0].repo,
+      url: .[0].url,
+      count: length,
+      subjects: [.[].subject] | unique | .[0:3]
+    }] |
+    [.[] | select(.count >= $min)] |
+    sort_by(-.count)
   ' "$GIT_JSON" 2>/dev/null)
 
-  if [[ -n "$git_rows" ]]; then
-    git_html="<h2>Git Activity</h2>
+  total_commits=$(jq 'length' "$GIT_JSON" 2>/dev/null || echo 0)
+  repo_count=$(echo "$git_repos_json" | jq 'length')
+
+  if [[ "$repo_count" -gt 0 ]]; then
+    git_rows=""
+    idx=0
+    while IFS= read -r row; do
+      repo_name=$(html_escape "$(echo "$row" | jq -r '.repo')")
+      url=$(echo "$row" | jq -r '.url')
+      count=$(echo "$row" | jq -r '.count')
+      highlights_text=$(html_escape "$(echo "$row" | jq -r '.subjects | join(", ")')")
+
+      hl=""
+      if [[ $idx -lt $HIGHLIGHTS ]]; then
+        hl=' class="hl"'
+      fi
+
+      git_rows+="<tr${hl}><td class=\"repo\">${repo_name}</td><td class=\"commits\">${count}</td><td>${highlights_text}</td></tr>
+"
+      idx=$((idx + 1))
+    done < <(echo "$git_repos_json" | jq -c '.[]')
+
+    git_html="
+<h2>Git Activity</h2>
 <table>
-<tr><th style=\"min-width:240px\">Repository</th><th>Highlights</th></tr>
-${git_rows}
-</table>"
+<tr><th>Repository</th><th class=\"commits\">#</th><th>Highlights</th></tr>
+${git_rows}</table>"
   fi
 fi
 
-# Escape title values
-SINCE_ESC=$(html_escape "$SINCE")
-UNTIL_ESC=$(html_escape "$UNTIL")
+# ── Format dates for display ─────────────────────────────────────
+since_display=$(date -j -f "%Y-%m-%d" "$SINCE" "+%b %-d" 2>/dev/null || date -d "$SINCE" "+%b %-d" 2>/dev/null || echo "$SINCE")
+until_display=$(date -j -f "%Y-%m-%d" "$UNTIL" "+%b %-d, %Y" 2>/dev/null || date -d "$UNTIL" "+%b %-d, %Y" 2>/dev/null || echo "$UNTIL")
+author_escaped=$(html_escape "$AUTHOR")
 
 # ── Write HTML ────────────────────────────────────────────────────
 cat > "$OUTPUT" << HTMLEOF
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Activity Report: ${SINCE_ESC} — ${UNTIL_ESC}</title>
-<style>
-  :root { --bg: #fff; --fg: #24292e; --border: #d0d7de; --header-bg: #f6f8fa; --accent: #0969da; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-         max-width: 960px; margin: 0 auto; padding: 24px; color: var(--fg); background: var(--bg); }
-  h1 { border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 4px; }
-  .author { color: #656d76; font-size: 15px; margin-top: 0; }
-  h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 32px; }
-  table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-  th { background: var(--header-bg); text-align: left; font-weight: 600; }
-  td, th { border: 1px solid var(--border); padding: 8px 12px; font-size: 14px; }
-  tr:hover td { background: #f6f8fa; }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; white-space: nowrap; }
-  .status-closed { background: #dafbe1; color: #1a7f37; }
-  .status-progress { background: #ddf4ff; color: #0969da; }
-  .status-new { background: #fff8c5; color: #9a6700; }
-  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border);
-            font-size: 12px; color: #656d76; text-align: center; }
-</style>
-</head>
-<body>
-<h1>Activity Report: ${SINCE_ESC} — ${UNTIL_ESC}</h1>
-${author_html}
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Activity Report: ${SINCE} — ${UNTIL}</title><style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f5f5;color:#1a1a1a;padding:24px;max-width:960px;margin:0 auto;font-size:14px;line-height:1.5}
+h1{font-size:20px;margin-bottom:4px;color:#1a1a1a}h2{font-size:15px;margin:20px 0 8px;color:#555;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e0e0e0;padding-bottom:4px}
+.meta{color:#888;font-size:12px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:8px}
+th{background:#f8f9fa;text-align:left;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#666;border-bottom:2px solid #e0e0e0}
+td{padding:6px 12px;border-bottom:1px solid #f0f0f0;font-size:13px}tr:last-child td{border-bottom:none}tr:hover{background:#f8f9fb}
+.s{text-align:center;width:32px}a{color:#0066cc;text-decoration:none}a:hover{text-decoration:underline}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.done{background:#e6f4ea;color:#1e7e34}.wip{background:#fff3cd;color:#856404}.new{background:#e2e3e5;color:#495057}
+.commits{text-align:center;width:60px;font-weight:600;color:#0066cc}.repo{white-space:nowrap}
+tr.hl{background:#fffbe6}tr.hl td:first-child{border-left:3px solid #f0c040}tr.hl:hover{background:#fff8d6}
+</style></head><body>
+<h1>Activity Report</h1>
+<div class="meta">${since_display} — ${until_display} · ${author_escaped} · ${total_commits} commits · ${ticket_count} tickets</div>
 ${jira_html}
 ${git_html}
-<div class="footer">Generated by cc-plugins/report</div>
-</body>
-</html>
+</body></html>
 HTMLEOF
 
 echo "Generated: $OUTPUT"
