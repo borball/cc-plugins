@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "A collection of Claude Code plugins for enterprise tool integrations — Red Hat support cases, Jira task tracking, Slack messaging, and activity reports",
-    "version": "0.8.0",
+    "version": "0.9.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -52,8 +52,8 @@
     {
       "name": "report",
       "source": "./plugins/report",
-      "description": "Generate activity reports from git and Jira — daily standups, weekly summaries, custom date ranges",
-      "version": "0.2.0",
+      "description": "Generate activity reports from git and Jira — daily standups, weekly/bi-weekly summaries, compact HTML with highlights",
+      "version": "0.3.0",
       "author": {
         "name": "github.com/borball"
       },
