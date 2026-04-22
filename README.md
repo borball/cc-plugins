@@ -9,7 +9,7 @@ A Claude Code plugin marketplace hosting enterprise tool integrations.
 | [rh-case](plugins/rh-case/) | 0.3.0 | Red Hat support case management — list, show, search, analyze, and comment on cases |
 | [jira](plugins/jira/) | 0.2.0 | Jira integration — pick tickets, track time, post work logs, and update status |
 | [slack](plugins/slack/) | 0.4.0 | Read, search, and send Slack messages — search conversations, read channels, follow threads, send messages |
-| [report](plugins/report/) | 0.2.0 | Generate activity reports from git and Jira — daily standups, weekly summaries |
+| [report](plugins/report/) | 0.2.0 | Generate activity reports from git and Jira — daily standups, weekly/bi-weekly summaries, compact HTML |
 
 ## Install
 
@@ -83,7 +83,7 @@ See [plugins/slack/README.md](plugins/slack/README.md) for details.
 
 ### report
 
-Generate activity reports from git and Jira. Commands: `/report init`, `/report generate`, `/report daily`, `/report weekly`, `/report monthly`, `/report status`.
+Generate activity reports from git and Jira in markdown and compact HTML. Commands: `/report init`, `/report generate`, `/report daily`, `/report weekly`, `/report biweekly`, `/report monthly`, `/report status`. Features Jira ticket links, status badges, deduplication, highlighted top items, and configurable min-commits filter.
 
 See [plugins/report/README.md](plugins/report/README.md) for details.
 
@@ -129,6 +129,7 @@ You don't need to memorize slash commands — just talk to Claude naturally. Her
 
 ```
 > generate my weekly report
+> generate my bi-weekly report
 > what did I work on last week?
 > give me a summary of the last 14 days
 > prepare my daily standup notes

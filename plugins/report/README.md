@@ -2,7 +2,7 @@
 
 [Claude Code](https://claude.ai/code) plugin for generating activity reports from git and Jira.
 
-Aggregate your work across multiple repositories into concise markdown reports — daily standups, weekly summaries, or custom date ranges.
+Aggregate your work across multiple repositories into concise markdown and HTML reports — daily standups, weekly summaries, bi-weekly reviews, or custom date ranges.
 
 ## Commands
 
@@ -12,6 +12,7 @@ Aggregate your work across multiple repositories into concise markdown reports �
 | `/report generate [days]` | Generate a report for a custom period |
 | `/report daily` | Yesterday's activity (standup prep) |
 | `/report weekly` | Last 7 days report |
+| `/report biweekly` | Last 14 days report |
 | `/report monthly` | Last 30 days report |
 | `/report status` | Show configuration and detected repos |
 
@@ -29,7 +30,7 @@ Aggregate your work across multiple repositories into concise markdown reports �
 
 Claude will ask for:
 1. **Repository paths** — parent directories or individual repos (GitHub, GitLab, or any local git repos)
-2. **Git author email** — auto-detected from `git config`
+2. **Git author name** — auto-detected from `git config`
 
 ## Usage
 
@@ -47,37 +48,58 @@ Claude will ask for:
 
 ```
 /report weekly
+/report biweekly
 /report daily
 /report generate 14
 /report generate --since 2026-03-01 --until 2026-03-15
 /report generate 7 --format html
+/report generate 14 --min-commits 5 --highlights 5
 ```
 
-## Report Output
+## Report Formatting
 
-Reports are formatted as concise markdown:
+Reports are generated in both markdown and HTML by default.
+
+### Jira section
+- **Linked tickets** — ticket IDs link to Jira browse URL
+- **Status icons** — ✅ Done, 🔄 In Progress, 📋 New (emoji in markdown, colored badges in HTML)
+- **No Type column** — only Ticket, Status, Summary
+- **Deduplication** — tickets with identical summaries are shown only once
+
+### Git section
+- **Minimum commits filter** — repos with fewer than N commits are hidden (default: 3)
+- **Sorted by commit count** descending
+- **Highlights** — top 3 commit subjects per repo
+
+### HTML-specific
+- **Compact single-file** — inline CSS, no external dependencies
+- **Highlighted rows** — top N Jira tickets and git repos get a yellow accent
+- **Status badges** — colored pills (green Done, yellow WIP, gray New)
+- **Wide repo column** — prevents wrapping on long repo names
+
+### Markdown example
 
 ```markdown
-# Activity Report: Mar 31 — Apr 06
+# Activity Report: 2026-04-08 — 2026-04-22
 
 ## Summary
 
-Focused on plugin development and infrastructure updates.
-15 commits across 2 repos, 2 Jira tickets closed.
+Productive sprint focused on policy updates and tooling improvements.
+47 commits across 7 repos, 10 Jira tickets.
 
 ## Jira
 
-| Ticket    | Type | Status      | Summary                     |
-|-----------|------|-------------|------------------------------|
-| PROJ-101  | Task | Done        | Upgrade database driver      |
-| PROJ-102  | Bug  | In Progress | Fix connection pool timeout  |
+| Ticket | Status | Summary |
+|--------|--------|---------|
+| [PROJ-101](https://jira.example.com/browse/PROJ-101) | 🔄 | Upgrade database driver |
+| [PROJ-102](https://jira.example.com/browse/PROJ-102) | ✅ | Fix connection pool timeout |
 
 ## Git Activity
 
-| Repository  | Commits | Highlights                          |
-|-------------|---------|-------------------------------------|
-| my-app      | 12      | API refactoring, new endpoints      |
-| infra-tools | 3       | CI pipeline updates                 |
+| Repository | Commits | Highlights |
+|------------|---------|------------|
+| my-app     | 12      | API refactoring, new endpoints, auth middleware |
+| infra-tools | 3      | CI pipeline updates, deploy script fix |
 ```
 
 ## Repo Discovery
@@ -114,13 +136,14 @@ report/
 │   ├── generate/SKILL.md      # /report:generate
 │   ├── daily/SKILL.md         # /report:daily
 │   ├── weekly/SKILL.md        # /report:weekly
+│   ├── biweekly/SKILL.md      # /report:biweekly
 │   ├── monthly/SKILL.md       # /report:monthly
 │   └── status/SKILL.md        # /report:status
 ├── scripts/
 │   ├── report-common.sh       # Shared helpers, config, repo discovery
 │   ├── report-init.sh         # Configuration setup
 │   ├── report-git-collect.sh  # Git commit collection across repos
-│   ├── report-html.sh         # HTML report generator
+│   ├── report-html.sh         # Compact HTML report generator
 │   └── report-status.sh       # Show configuration
 ├── CLAUDE.md
 └── README.md
