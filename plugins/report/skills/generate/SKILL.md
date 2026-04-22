@@ -89,9 +89,11 @@ Guidelines:
 
 Always generate HTML alongside markdown (unless `--format md` was specified).
 
-Save the git JSON to a temp file and optionally the Jira JSON, then run:
+1. Save the git JSON to a temp file and optionally the Jira JSON
+2. Save the summary text (the same 2-3 sentence summary from the markdown report) to a temp file
+3. Run the HTML generator:
 ```bash
-CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/report-html.sh <output.html> "<since>" "<until>" <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights]
+CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/report-html.sh <output.html> "<since>" "<until>" <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights] [summary_file]
 ```
 
-Parameters: jira_url is auto-detected from jira plugin config, author from git config. The HTML report uses a compact styled template with colored status badges and highlighted top items.
+Parameters: jira_url is auto-detected from jira plugin config, author from git config. The summary_file is a plain text file containing the summary paragraph. The HTML report uses a compact styled template with a blue-accented summary box, colored status badges, and highlighted top items.

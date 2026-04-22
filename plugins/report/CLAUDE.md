@@ -62,8 +62,10 @@ Both markdown and HTML reports follow these rules:
 
 ### report-html.sh usage
 ```bash
-report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights]
+report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights] [summary_file]
 ```
+
+The `summary_file` is a plain text file containing the summary paragraph (same 2-3 sentences as in the markdown). It renders as a blue-accented box at the top of the HTML report.
 
 ## Repo Discovery
 

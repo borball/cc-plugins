@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # report-html.sh — Generate a compact styled HTML report from git and Jira JSON data
-# Usage: report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights]
+# Usage: report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights] [summary_file]
 
 set -euo pipefail
 
-OUTPUT="${1:?Usage: report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights]}"
+OUTPUT="${1:?Usage: report-html.sh <output.html> <since> <until> <git.json> [jira.json] [jira_url] [author] [min_commits] [highlights] [summary_file]}"
 SINCE="${2:?}"
 UNTIL="${3:?}"
 GIT_JSON="${4:?}"
@@ -13,6 +13,7 @@ JIRA_URL="${6:-}"
 AUTHOR="${7:-}"
 MIN_COMMITS="${8:-3}"
 HIGHLIGHTS="${9:-3}"
+SUMMARY_FILE="${10:-}"
 
 # ── HTML escaping ─────────────────────────────────────────────────
 html_escape() {
@@ -145,6 +146,15 @@ ${git_rows}</table>"
   fi
 fi
 
+# ── Build Summary ────────────────────────────────────────────────
+summary_html=""
+if [[ -n "$SUMMARY_FILE" && -f "$SUMMARY_FILE" ]]; then
+  summary_text=$(html_escape "$(cat "$SUMMARY_FILE")")
+  summary_html="
+<h2>Summary</h2>
+<div class=\"summary\">${summary_text}</div>"
+fi
+
 # ── Format dates for display ─────────────────────────────────────
 since_display=$(date -j -f "%Y-%m-%d" "$SINCE" "+%b %-d" 2>/dev/null || date -d "$SINCE" "+%b %-d" 2>/dev/null || echo "$SINCE")
 until_display=$(date -j -f "%Y-%m-%d" "$UNTIL" "+%b %-d, %Y" 2>/dev/null || date -d "$UNTIL" "+%b %-d, %Y" 2>/dev/null || echo "$UNTIL")
@@ -155,7 +165,7 @@ cat > "$OUTPUT" << HTMLEOF
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Activity Report: ${SINCE} — ${UNTIL}</title><style>
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f5f5;color:#1a1a1a;padding:24px;max-width:960px;margin:0 auto;font-size:14px;line-height:1.5}
 h1{font-size:20px;margin-bottom:4px;color:#1a1a1a}h2{font-size:15px;margin:20px 0 8px;color:#555;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e0e0e0;padding-bottom:4px}
-.meta{color:#888;font-size:12px;margin-bottom:16px}
+.meta{color:#888;font-size:12px;margin-bottom:16px}.summary{background:#fff;border-left:3px solid #0066cc;padding:12px 16px;margin-bottom:8px;border-radius:0 4px 4px 0;font-size:13px;color:#333}
 table{width:100%;border-collapse:collapse;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:8px}
 th{background:#f8f9fa;text-align:left;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#666;border-bottom:2px solid #e0e0e0}
 td{padding:6px 12px;border-bottom:1px solid #f0f0f0;font-size:13px}tr:last-child td{border-bottom:none}tr:hover{background:#f8f9fb}
@@ -167,6 +177,7 @@ tr.hl{background:#fffbe6}tr.hl td:first-child{border-left:3px solid #f0c040}tr.h
 </style></head><body>
 <h1>Activity Report</h1>
 <div class="meta">${since_display} — ${until_display} · ${author_escaped} · ${total_commits} commits · ${ticket_count} tickets</div>
+${summary_html}
 ${jira_html}
 ${git_html}
 </body></html>
