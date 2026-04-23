@@ -13,6 +13,7 @@ Based on the first word of the arguments, dispatch as follows:
 - **status** → Run `/jira:status`
 - **log** [message] → Run `/jira:log` with the remaining arguments
 - **done** [message] → Run `/jira:done` with the remaining arguments
+- **update** [KEY] [description] → Run `/jira:update` with the remaining arguments
 - **help** or empty → Show available subcommands listed below
 
 ## Available subcommands
@@ -23,4 +24,5 @@ Based on the first word of the arguments, dispatch as follows:
 /jira status            — Show current active task
 /jira log [message]     — Post a status update
 /jira done [message]    — Log work and close ticket
+/jira update [KEY]      — Update ticket description or summary
 ```

@@ -17,6 +17,7 @@ CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/<script
 /jira status          — show current task
 /jira log [message]   — post a status update
 /jira done [message]  — log work and close ticket
+/jira update [KEY]    — update ticket description or summary
 ```
 
 ## Project structure
@@ -26,6 +27,7 @@ CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/<script
   - `jira-pick.sh` — Pick a ticket to work on
   - `jira-create.sh` — Create a new Jira ticket
   - `jira-transition.sh` — Transition ticket status
+  - `jira-update.sh` — Update ticket description or summary
   - `jira-log.sh` — Post work logs / comments to Jira
   - `jira-status.sh` — Show current active task
   - `generate-worklog.sh` — Gather git context for work log generation
@@ -42,6 +44,14 @@ CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/<script
    - New tickets are auto-assigned to the creator
    - Descriptions include "Posted via claude-code-jira" attribution
 4. Run `CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/jira-transition.sh "" progress` to move it to In Progress
+
+## When user asks to update a ticket description
+
+1. Determine the ticket key — use provided key or fall back to the current active task
+2. Get the new description content from the user (supports markdown)
+3. Save the description to `/tmp/jira-update-desc-TICKET_KEY.md`
+4. Run `CLAUDE_PLUGIN_DATA="${CLAUDE_PLUGIN_DATA}" ${CLAUDE_PLUGIN_ROOT}/scripts/jira-update.sh TICKET_KEY --desc-file /tmp/jira-update-desc-TICKET_KEY.md`
+5. To also update the summary/title, add `--summary "New title"` to the command
 
 ## When user asks to wrap up / end a task
 

@@ -7,7 +7,7 @@ A Claude Code plugin marketplace hosting enterprise tool integrations.
 | Plugin                        | Version | Description |
 |-------------------------------|---------|-------------|
 | [rh-case](plugins/rh-case/) | 0.3.0 | Red Hat support case management — list, show, search, analyze, and comment on cases |
-| [jira](plugins/jira/) | 0.2.0 | Jira integration — pick tickets, track time, post work logs, and update status |
+| [jira](plugins/jira/) | 0.3.0 | Jira integration — pick tickets, track time, post work logs, update descriptions, and manage status |
 | [slack](plugins/slack/) | 0.4.0 | Read, search, and send Slack messages — search conversations, read channels, follow threads, send messages |
 | [report](plugins/report/) | 0.3.0 | Generate activity reports from git and Jira — daily standups, weekly/bi-weekly summaries, compact HTML |
 
@@ -71,7 +71,7 @@ See [plugins/rh-case/README.md](plugins/rh-case/README.md) for details.
 
 ### jira
 
-Jira task tracking with automatic time logging. Commands: `/jira init`, `/jira start`, `/jira status`, `/jira log`, `/jira done`.
+Jira task tracking with automatic time logging. Commands: `/jira init`, `/jira start`, `/jira status`, `/jira log`, `/jira done`, `/jira update`.
 
 See [plugins/jira/README.md](plugins/jira/README.md) for details.
 

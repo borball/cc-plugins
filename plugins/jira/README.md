@@ -30,6 +30,7 @@ Then run:
 | `/jira status` | Show current task with elapsed time |
 | `/jira log [message]` | Post a progress update (ticket stays open) |
 | `/jira done [message]` | Post final log and transition to Done |
+| `/jira update [KEY]` | Update ticket description or summary |
 
 ## Workflow
 
@@ -38,6 +39,7 @@ Then run:
     ... write code with Claude's help ...
 /jira log fixed the auth bug <- post an update mid-session
     ... keep working ...
+/jira update                 <- update the ticket description
 /jira done                   <- auto-summarize, post log, close ticket
 ```
 
@@ -68,6 +70,15 @@ Posts a comment and worklog entry to Jira. Ticket stays open — use this for pr
 ```
 
 Posts the work log, then asks if you want to transition the ticket to Done.
+
+### Updating a ticket
+
+```
+/jira update PROJ-123      # update description of a specific ticket
+/jira update               # update description of current active task
+```
+
+Provide the new description content (supports markdown). You can also update the ticket summary/title.
 
 ### Checking status
 
@@ -112,13 +123,15 @@ jira/
 │   ├── start/SKILL.md         # /jira:start
 │   ├── status/SKILL.md        # /jira:status
 │   ├── log/SKILL.md           # /jira:log
-│   └── done/SKILL.md          # /jira:done
+│   ├── done/SKILL.md          # /jira:done
+│   └── update/SKILL.md        # /jira:update
 ├── scripts/
 │   ├── jira-common.sh         # Shared auth & API helpers
 │   ├── jira-init.sh           # Interactive credential setup
 │   ├── jira-pick.sh           # Interactive ticket picker
 │   ├── jira-create.sh         # Create new tickets
 │   ├── jira-transition.sh     # Transition ticket status
+│   ├── jira-update.sh         # Update ticket fields
 │   ├── jira-log.sh            # Post work logs & comments
 │   ├── jira-status.sh         # Show current task
 │   ├── generate-worklog.sh    # Gather git context for summaries

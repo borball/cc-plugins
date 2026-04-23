@@ -1,6 +1,6 @@
 {
   "name": "jira",
-  "description": "Jira integration — pick tickets, track time, post work logs, and update status without leaving your terminal",
+  "description": "Jira integration — pick tickets, track time, post work logs, update descriptions, and manage status without leaving your terminal",
   "author": {
     "name": "github.com/borball"
   }

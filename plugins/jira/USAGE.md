@@ -111,7 +111,29 @@ Should I transition PROJ-341 to Done?
 
 Say yes, and the ticket is closed. Say no, and it stays In Progress for the next session.
 
-### 6. Check status anytime
+### 6. Update a ticket description
+
+Need to revise the ticket description after you've learned more about the problem?
+
+```
+> /jira update PROJ-341
+```
+
+Claude asks for the new description. Provide it in markdown:
+
+```
+> Set the description to:
+> ## Problem
+> Auth middleware times out after 30s under load due to connection pool exhaustion.
+> ## Acceptance Criteria
+> - Timeout increased to 60s
+> - Retry logic with exponential backoff
+> - Connection pool properly releases on timeout
+```
+
+Claude converts the markdown to Jira's format and updates the ticket. You can also update the summary/title at the same time.
+
+### 7. Check status anytime
 
 ```
 > /jira status
@@ -257,6 +279,7 @@ Both work. Use whichever feels natural:
 | `/jira status` | "what am I working on?" |
 | `/jira log` | "post an update to Jira" |
 | `/jira log fixed the bug` | "log that I fixed the bug" |
+| `/jira update PROJ-123` | "update the description of PROJ-123" |
 | `/jira done` | "wrap up this ticket" |
 
 The slash commands are faster (single keystroke with tab completion). Natural language is more flexible and allows combining actions.

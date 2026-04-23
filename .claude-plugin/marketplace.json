@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "A collection of Claude Code plugins for enterprise tool integrations — Red Hat support cases, Jira task tracking, Slack messaging, and activity reports",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -26,8 +26,8 @@
     {
       "name": "jira",
       "source": "./plugins/jira",
-      "description": "Jira integration — pick tickets, track time, post work logs, and update status without leaving your terminal",
-      "version": "0.2.0",
+      "description": "Jira integration — pick tickets, track time, post work logs, update descriptions, and manage status without leaving your terminal",
+      "version": "0.3.0",
       "author": {
         "name": "github.com/borball"
       },
